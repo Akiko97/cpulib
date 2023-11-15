@@ -622,6 +622,7 @@ impl Registers {
             }
         }
     }
+
     /// Retrieves the value of a specified instruction pointer (IP) register.
     ///
     /// Depending on the type of IP register queried (RIP, EIP, or IP), it returns
