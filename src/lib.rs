@@ -55,7 +55,7 @@ impl CPU {
     ///
     /// # Returns
     /// Returns a new `CPU` instance with initialized registers and memory.
-    fn new(base: usize) -> Self {
+    pub fn new(base: usize) -> Self {
         CPU {
             registers: Registers::new(),
             memory: Memory::new(base)
