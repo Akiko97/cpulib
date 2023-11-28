@@ -1,6 +1,8 @@
 extern crate bit_vec;
-use bit_vec::BitVec;
 extern crate regex;
+
+use std::fmt::{Display, Formatter};
+use bit_vec::BitVec;
 use regex::Regex;
 
 // trait alias and enum
@@ -29,6 +31,21 @@ pub enum VecRegName {
     XMM, YMM, ZMM
 }
 
+/// Implements the `Display` trait for `VecRegName`.
+///
+/// This implementation allows for the human-readable representation of the SIMD vector
+/// register names. Each variant of the `VecRegName` is formatted into its corresponding
+/// register name string.
+impl Display for VecRegName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            VecRegName::XMM => "XMM",
+            VecRegName::YMM => "YMM",
+            VecRegName::ZMM => "ZMM",
+        })
+    }
+}
+
 /// An enumeration representing General Purpose Register (GPR) names.
 ///
 /// This enum includes register names for various sizes: 64-bit (RAX, RBX, ...),
@@ -47,6 +64,86 @@ pub enum GPRName {
     // 8-bit registers
     AH, BH, CH, DH, AL, BL, CL, DL, SIL, DIL, BPL, SPL,
     R8B, R9B, R10B, R11B, R12B, R13B, R14B, R15B
+}
+
+/// Implements the `Display` trait for `GPRName`.
+///
+/// This implementation allows for the human-readable representation of the General Purpose
+/// Register names. Each variant of the `GPRName` is formatted into its corresponding
+/// register name string.
+impl Display for GPRName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            GPRName::RAX => "RAX",
+            GPRName::RBX => "RBX",
+            GPRName::RCX => "RCX",
+            GPRName::RDX => "RDX",
+            GPRName::RSI => "RSI",
+            GPRName::RDI => "RDI",
+            GPRName::RBP => "RBP",
+            GPRName::RSP => "RSP",
+            GPRName::R8 => "R8",
+            GPRName::R9 => "R9",
+            GPRName::R10 => "R10",
+            GPRName::R11 => "R11",
+            GPRName::R12 => "R12",
+            GPRName::R13 => "R13",
+            GPRName::R14 => "R14",
+            GPRName::R15 => "R15",
+            GPRName::EAX => "EAX",
+            GPRName::EBX => "EBX",
+            GPRName::ECX => "ECX",
+            GPRName::EDX => "EDX",
+            GPRName::ESI => "ESI",
+            GPRName::EDI => "EDI",
+            GPRName::EBP => "EBP",
+            GPRName::ESP => "ESP",
+            GPRName::R8D => "R8D",
+            GPRName::R9D => "R9D",
+            GPRName::R10D => "R10D",
+            GPRName::R11D => "R11D",
+            GPRName::R12D => "R12D",
+            GPRName::R13D => "R13D",
+            GPRName::R14D => "R14D",
+            GPRName::R15D => "R15D",
+            GPRName::AX => "AX",
+            GPRName::BX => "BX",
+            GPRName::CX => "CX",
+            GPRName::DX => "DX",
+            GPRName::SI => "SI",
+            GPRName::DI => "DI",
+            GPRName::BP => "BP",
+            GPRName::SP => "SP",
+            GPRName::R8W => "R8W",
+            GPRName::R9W => "R9W",
+            GPRName::R10W => "R10W",
+            GPRName::R11W => "R11W",
+            GPRName::R12W => "R12W",
+            GPRName::R13W => "R13W",
+            GPRName::R14W => "R14W",
+            GPRName::R15W => "R15W",
+            GPRName::AH => "AH",
+            GPRName::BH => "BH",
+            GPRName::CH => "CH",
+            GPRName::DH => "DH",
+            GPRName::AL => "AL",
+            GPRName::BL => "BL",
+            GPRName::CL => "CL",
+            GPRName::DL => "DL",
+            GPRName::SIL => "SIL",
+            GPRName::DIL => "DIL",
+            GPRName::BPL => "BPL",
+            GPRName::SPL => "SPL",
+            GPRName::R8B => "R8B",
+            GPRName::R9B => "R9B",
+            GPRName::R10B => "R10B",
+            GPRName::R11B => "R11B",
+            GPRName::R12B => "R12B",
+            GPRName::R13B => "R13B",
+            GPRName::R14B => "R14B",
+            GPRName::R15B => "R15B",
+        })
+    }
 }
 
 /// An enumeration of flag register names for different bit sizes.
