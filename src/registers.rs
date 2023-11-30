@@ -26,7 +26,7 @@ impl<T:
 ///
 /// This enum represents various SIMD registers, such as XMM, YMM, and ZMM, which are
 /// commonly used in advanced processor features for parallel data processing.
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
 pub enum VecRegName {
     XMM, YMM, ZMM
 }
@@ -50,7 +50,7 @@ impl Display for VecRegName {
 ///
 /// This enum includes register names for various sizes: 64-bit (RAX, RBX, ...),
 /// 32-bit (EAX, EBX, ...), 16-bit (AX, BX, ...), and 8-bit (AH, AL, ...).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
 pub enum GPRName {
     // 64-bit registers
     RAX, RBX, RCX, RDX, RSI, RDI, RBP, RSP,
