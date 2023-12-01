@@ -403,6 +403,44 @@ impl Clone for GPR {
 
 impl Copy for GPR {}
 
+macro_rules! register_set {
+    ($self:ident; $reg_name:expr; $value:expr; $( $r64:ident, $r32:ident, $r16:ident, $r8_l:ident, $r8_h:ident ),*; $( $r64_:ident, $r32_:ident, $r16_:ident, $r8_:ident ),* ) => {
+        match $reg_name {
+            $(
+                GPRName::$r32 => $self.gpr[GPRName::$r64 as usize].value = $value & 0x00000000_FFFFFFFF,
+                GPRName::$r16 => $self.gpr[GPRName::$r64 as usize].value = ($self.gpr[GPRName::$r64 as usize].value & 0xFFFFFFFF_FFFF0000) | ($value & 0x00000000_0000FFFF),
+                GPRName::$r8_l => $self.gpr[GPRName::$r64 as usize].value = ($self.gpr[GPRName::$r64 as usize].value & 0xFFFFFFFF_FFFFFF00) | ($value & 0x00000000_000000FF),
+                GPRName::$r8_h => $self.gpr[GPRName::$r64 as usize].value = ($self.gpr[GPRName::$r64 as usize].value & 0xFFFFFFFF_FFFF00FF) | (($value << 8) & 0x00000000_0000FF00),
+            )*
+            $(
+                GPRName::$r32_ => $self.gpr[GPRName::$r64_ as usize].value = $value & 0x00000000_FFFFFFFF,
+                GPRName::$r16_ => $self.gpr[GPRName::$r64_ as usize].value = ($self.gpr[GPRName::$r64_ as usize].value & 0xFFFFFFFF_FFFF0000) | ($value & 0x00000000_0000FFFF),
+                GPRName::$r8_ => $self.gpr[GPRName::$r64_ as usize].value = ($self.gpr[GPRName::$r64_ as usize].value & 0xFFFFFFFF_FFFFFF00) | ($value & 0x00000000_000000FF),
+            )*
+            _ => $self.gpr[$reg_name as usize].set_value($value),
+        }
+    }
+}
+
+macro_rules! register_get {
+    ($self:ident; $reg_name:expr; $( $r64:ident, $r32:ident, $r16:ident, $r8_l:ident, $r8_h:ident ),*; $( $r64_:ident, $r32_:ident, $r16_:ident, $r8_:ident ),* ) => {
+        match $reg_name {
+            $(
+                GPRName::$r32 => $self.gpr[GPRName::$r64 as usize].value & 0x00000000_FFFFFFFF,
+                GPRName::$r16 => $self.gpr[GPRName::$r64 as usize].value & 0x00000000_0000FFFF,
+                GPRName::$r8_l => $self.gpr[GPRName::$r64 as usize].value & 0x00000000_000000FF,
+                GPRName::$r8_h => ($self.gpr[GPRName::$r64 as usize].value & 0x00000000_0000FF00) >> 8,
+            )*
+            $(
+                GPRName::$r32_ => $self.gpr[GPRName::$r64_ as usize].value & 0x00000000_FFFFFFFF,
+                GPRName::$r16_ => $self.gpr[GPRName::$r64_ as usize].value & 0x00000000_0000FFFF,
+                GPRName::$r8_ => $self.gpr[GPRName::$r64_ as usize].value & 0x00000000_000000FF,
+            )*
+            _ => $self.gpr[$reg_name as usize].get_value(),
+        }
+    }
+}
+
 impl Registers {
     /// Creates a new Registers struct with initialized values.
     ///
@@ -610,25 +648,24 @@ impl Registers {
     /// * `reg_name` - The name of the general-purpose register.
     /// * `value` - The value to set the register to.
     pub fn set_gpr_value(&mut self, reg_name: GPRName, value: u64) {
-        match reg_name {
-            GPRName::EAX => {
-                self.gpr[GPRName::RAX as usize].value = value & 0x00000000_FFFFFFFF;
-            }
-            GPRName::AX => {
-                self.gpr[GPRName::RAX as usize].value = (self.gpr[GPRName::RAX as usize].value & 0xFFFFFFFF_FFFF0000) | (value & 0x00000000_0000FFFF);
-            }
-            GPRName::AL => {
-                self.gpr[GPRName::RAX as usize].value = (self.gpr[GPRName::RAX as usize].value & 0xFFFFFFFF_FFFFFF00) | (value & 0x00000000_000000FF);
-            }
-            GPRName::AH => {
-                self.gpr[GPRName::RAX as usize].value = (self.gpr[GPRName::RAX as usize].value & 0xFFFFFFFF_FFFF00FF) | ((value << 8) & 0x00000000_0000FF00);
-            }
-            // TODO: add other registers
-            _ => {
-                let index = reg_name as usize;
-                self.gpr[index].set_value(value);
-            }
-        }
+        register_set!(self; reg_name; value;
+            RAX, EAX, AX, AL, AH,
+            RBX, EBX, BX, BL, BH,
+            RCX, ECX, CX, CL, CH,
+            RDX, EDX, DX, DL, DH;
+            R8, R8D, R8W, R8B,
+            R9, R9D, R9W, R9B,
+            R10, R10D, R10W, R10B,
+            R11, R11D, R11W, R11B,
+            R12, R12D, R12W, R12B,
+            R13, R13D, R13W, R13B,
+            R14, R14D, R14W, R14B,
+            R15, R15D, R15W, R15B,
+            RSP, ESP, SP, SPL,
+            RBP, EBP, BP, BPL,
+            RSI, ESI, SI, SIL,
+            RDI, EDI, DI, DIL
+        );
     }
 
     /// Retrieves the value of a specified general-purpose register.
@@ -639,25 +676,24 @@ impl Registers {
     /// # Returns
     /// The current value of the specified register.
     pub fn get_gpr_value(&self, reg_name: GPRName) -> u64 {
-        match reg_name {
-            GPRName::EAX => {
-                self.gpr[GPRName::RAX as usize].value & 0x00000000_FFFFFFFF
-            }
-            GPRName::AX => {
-                self.gpr[GPRName::RAX as usize].value & 0x00000000_0000FFFF
-            }
-            GPRName::AL => {
-                self.gpr[GPRName::RAX as usize].value & 0x00000000_000000FF
-            }
-            GPRName::AH => {
-                (self.gpr[GPRName::RAX as usize].value & 0x00000000_0000FF00) >> 8
-            }
-            // TODO: add other registers
-            _ => {
-                let index = reg_name as usize;
-                self.gpr[index].get_value()
-            }
-        }
+        register_get!(self; reg_name;
+            RAX, EAX, AX, AL, AH,
+            RBX, EBX, BX, BL, BH,
+            RCX, ECX, CX, CL, CH,
+            RDX, EDX, DX, DL, DH;
+            R8, R8D, R8W, R8B,
+            R9, R9D, R9W, R9B,
+            R10, R10D, R10W, R10B,
+            R11, R11D, R11W, R11B,
+            R12, R12D, R12W, R12B,
+            R13, R13D, R13W, R13B,
+            R14, R14D, R14W, R14B,
+            R15, R15D, R15W, R15B,
+            RSP, ESP, SP, SPL,
+            RBP, EBP, BP, BPL,
+            RSI, ESI, SI, SIL,
+            RDI, EDI, DI, DIL
+        )
     }
 
     /// Sets the value of a specified flags register.
