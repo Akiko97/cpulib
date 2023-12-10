@@ -31,6 +31,8 @@ pub use memory::Memory;
 
 pub use utilities::Utilities;
 
+pub use registers::SectionCompatible;
+
 /// Represents the CPU context in the emulator.
 ///
 /// Contains registers and memory components necessary for CPU operations.
