@@ -294,6 +294,7 @@ impl SIMDRegister {
     /// # Returns
     /// `true` if the operation was successful, `false` otherwise.
     fn set_by_sections<T: SectionCompatible>(&mut self, sections: Vec<T>) -> bool {
+        self.clear();
         let type_bits = std::mem::size_of::<T>() * 8;
         if type_bits * sections.len() != self.bits.len() {
             return false;
