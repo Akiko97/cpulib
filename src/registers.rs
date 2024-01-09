@@ -212,7 +212,7 @@ struct GPR {
 /// This struct includes SIMD registers, general-purpose registers (GPRs), flag registers,
 /// and instruction pointers, along with methods to manipulate these registers.
 pub struct Registers {
-    simd_registers: [SIMDRegister; 16],
+    simd_registers: [SIMDRegister; 32],
     gpr: [GPR; 16],
     rflags: u64,
     rip: u64,
@@ -449,6 +449,14 @@ impl Registers {
     pub fn new() -> Self {
         Registers {
             simd_registers: [
+                SIMDRegister::new(512), SIMDRegister::new(512),
+                SIMDRegister::new(512), SIMDRegister::new(512),
+                SIMDRegister::new(512), SIMDRegister::new(512),
+                SIMDRegister::new(512), SIMDRegister::new(512),
+                SIMDRegister::new(512), SIMDRegister::new(512),
+                SIMDRegister::new(512), SIMDRegister::new(512),
+                SIMDRegister::new(512), SIMDRegister::new(512),
+                SIMDRegister::new(512), SIMDRegister::new(512),
                 SIMDRegister::new(512), SIMDRegister::new(512),
                 SIMDRegister::new(512), SIMDRegister::new(512),
                 SIMDRegister::new(512), SIMDRegister::new(512),
