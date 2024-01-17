@@ -105,7 +105,7 @@ struct MemorySegment {
 /// Provides functionality for reading and writing data to specific memory addresses.
 pub struct Memory {
     segments: Vec<MemorySegment>,
-    base_address: usize,
+    pub base_address: usize,
 }
 
 impl Memory {
